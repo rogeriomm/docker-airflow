@@ -60,6 +60,7 @@ x-airflow-common:
     - ./dags:/opt/airflow/dags
     - ./logs:/opt/airflow/logs
     - ./plugins:/opt/airflow/plugins
+    - work:/data
   user: "${AIRFLOW_UID:-50000}:${AIRFLOW_GID:-50000}"
   depends_on:
     redis:
@@ -150,6 +151,7 @@ services:
       _AIRFLOW_WWW_USER_PASSWORD: ${_AIRFLOW_WWW_USER_PASSWORD:-airflow}
     networks:
       - spark-net
+
   flower:
     <<: *airflow-common
     command: celery flower
@@ -166,6 +168,10 @@ services:
 
 volumes:
   postgres-db-volume:
+  # docker volume create --name work --opt type=none --opt device=/Users/rogermm/git/dataops/bdmm/labtools/work/data --opt o=bind
+  work:
+     external:
+       name: work
 
 networks:
   spark-net:
