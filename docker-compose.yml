@@ -60,7 +60,7 @@ x-airflow-common:
     - ./dags:/opt/airflow/dags
     - ./logs:/opt/airflow/logs
     - ./plugins:/opt/airflow/plugins
-    - work:/data
+    - work:/share
   user: "${AIRFLOW_UID:-50000}:${AIRFLOW_GID:-50000}"
   depends_on:
     redis:
@@ -103,14 +103,18 @@ services:
   airflow-webserver:
     <<: *airflow-common
     command: webserver
-    ports:
-      - 8080:8080
+    #ports:
+    #  - 8080:8080
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
       interval: 10s
       timeout: 10s
       retries: 5
     restart: always
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.airflow.rule=Host(`airflow.bdb`)"
+      - "traefik.http.routers.airflow.entrypoints=web"
     networks:
       - spark-net
 
